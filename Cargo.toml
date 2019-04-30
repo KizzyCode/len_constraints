@@ -1,0 +1,28 @@
+[package]
+name = "len_constraints"
+edition = "2018"
+version = "0.1.0"
+authors = ["Keziah Biermann <development@kizzycode.de>"]
+description = "Traits and types to implement type-pinned length constraints in your API"
+keywords = ["Length Constraints", "API Validation"]
+categories = ["rust-patterns"]
+license = "BSD-2-Clause OR MIT"
+repository = "https://github.com/KizzyCode/len_constraints"
+readme = "README.md"
+
+[badges]
+travis-ci = { repository = "KizzyCode/len_constraints" }
+appveyor = { repository = "KizzyCode/len_constraints" }
+maintenance = { status = "passively-maintained" }
+is-it-maintained-open-issues = { repository = "KizzyCode/len_constraints" }
+is-it-maintained-issue-resolution = { repository = "KizzyCode/len_constraints" }
+
+
+[dependencies]
+
+
+[profile.release]
+overflow-checks = true
+
+[profile.bench]
+overflow-checks = true
