@@ -20,6 +20,8 @@ in your API.
 ## Why?
 How often have you seen APIs like this?
 ```rust
+// BAD EXAMPLE!
+
 fn encrypt(buf: &mut[u8], plaintext: &[u8], key: &[u8], nonce: &[u8])
 	-> Result<usize, Box<dyn Error + 'static>>
 {
@@ -33,10 +35,12 @@ fn encrypt(buf: &mut[u8], plaintext: &[u8], key: &[u8], nonce: &[u8])
 	unimplemented!()
 }
 ```
+As you can see, this API is pretty opaque and requires a lot of manual checks.
 
-As you can see, this API is pretty opaque and requires a lot of manual checks. Of course s.o. could
-use array references:
+Of course s.o. could use array references:
 ```rust
+// MEH EXAMPLE...
+
 fn encrypt(buf: &mut[u8], plaintext: &[u8], key: &[u8; 32], nonce: &[u8; 12])
 	-> Result<usize, Box<dyn Error + 'static>>
 {
@@ -48,11 +52,14 @@ fn encrypt(buf: &mut[u8], plaintext: &[u8], key: &[u8; 32], nonce: &[u8; 12])
 	unimplemented!()
 }
 ```
-
 But array references also have their disadvantages. They are not suitable for multiple valid lengths
 (allow anything in `16..=32`) nor can they represent relative relationships. Also converting between
-other data types and arrays can get annoying. `len_constraints` tries to solve this problem:
+other data types and arrays can get annoying.
+
+`len_constraints` tries to solve this problem:
 ```rust
+// GOOD EXAMPLE :D
+
 use std::{ convert::TryInto, error::Error };
 use len_constraints::{
 	slice_mut::RelativeMut, slice::{ Fixed, Ranged },
