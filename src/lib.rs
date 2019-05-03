@@ -59,10 +59,6 @@
 //! 	let buf = buf.get_slice_mut(plaintext.len())?;
 //!
 //! 	// Do sth.
-//! 	assert_eq!(buf.len(), plaintext.len() + 16);
-//! 	assert!(plaintext.len() < 65536);
-//! 	assert_eq!(key.len(), 32);
-//! 	assert_eq!(nonce.len(), 12);
 //! 	Ok(7)
 //! }
 //!
@@ -78,7 +74,6 @@
 //! 	Ok(())
 //! }
 //! ```
-//!
 //! As you can see, we now can describe complex relationships in the function signature – this makes
 //! the API more transparent and removes the need for manual (and error-prone) parameter validation.
 
@@ -90,6 +85,7 @@
 pub mod slice;
 /// Some wrappers for mutable slices with various length constraints
 pub mod slice_mut;
+#[macro_use] mod constraint_macro;
 
 pub use self::type_math::{ TypeNum, Operator };
 use std::{

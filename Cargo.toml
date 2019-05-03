@@ -1,7 +1,7 @@
 [package]
 name = "len_constraints"
 edition = "2018"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Keziah Biermann <development@kizzycode.de>"]
 description = "Traits and types to implement type-pinned length constraints in your API"
 keywords = ["Constraints", "API-Validation"]

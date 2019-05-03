@@ -73,10 +73,6 @@ fn encrypt(buf: RelativeMut<u8, Add, _16>, plaintext: Ranged<u8, _0, _65536>,
 	let buf = buf.get_slice_mut(plaintext.len())?;
 
 	// Do sth.
-	assert_eq!(buf.len(), plaintext.len() + 16);
-	assert!(plaintext.len() < 65536);
-	assert_eq!(key.len(), 32);
-	assert_eq!(nonce.len(), 12);
 	Ok(7)
 }
 
@@ -92,11 +88,6 @@ fn main() -> Result<(), Box<Error + 'static>> {
 	Ok(())
 }
 ```
-
 As you can see, we now can describe complex relationships in the function signature – this makes the
 API more transparent and removes the need for manual (and error-prone) parameter validation. Also,
 the API is slice-friendly.
-
-
-## Dependencies
-None 😊

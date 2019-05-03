@@ -74,14 +74,24 @@ impl_conv!(Ranged<'a, T, Start, End> where 'a, T, Start: TypeNum, End: TypeNum);
 
 /// An immutable slice with a relative length as length constraint
 ///
-/// _Note: Unlike the other constrained slices, this type does not validate the constraint on
-/// construction but on deconstruction (`self.try_into()`)_
+/// _Note: Unlike the other constrained slices, this type does not necessarily validate the
+/// constraint on construction but on deconstruction (`self.try_into()`)_
 #[derive(Debug, Copy, Clone)]
 pub struct Relative<'a, T, Op: Operator, By: TypeNum> {
 	slice: &'a[T],
 	constraint: PhantomData<(Op, By)>
 }
 impl<'a, T, Op: Operator, By: TypeNum> Relative<'a, T, Op, By> {
+	/// Validates `slice` against the length constraint and creates the constrained slice with it
+	pub fn try_from(slice: &'a[T], relative_to: usize) -> Result<Self, Box<Error + 'static>> {
+		let expected = Op::r#do(relative_to, By::VALUE)?;
+		match slice.len() {
+			len if len == expected => Ok(Self::from(slice)),
+			len =>
+				Err(ConstraintViolation::relative::<Op, By>(len, relative_to))?
+		}
+	}
+	
 	/// Computes the expected relative length from `relative_to`, validates the wrapped `slice`
 	/// against in and returns it on success
 	pub fn get_slice(self, relative_to: usize) -> Result<&'a[T], Box<Error + 'static>> {

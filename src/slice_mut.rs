@@ -100,6 +100,16 @@ pub struct RelativeMut<'a, T, Op: Operator, By: TypeNum> {
 	constraint: PhantomData<(Op, By)>
 }
 impl<'a, T, Op: Operator, By: TypeNum> RelativeMut<'a, T, Op, By> {
+	/// Validates `slice` against the length constraint and creates the constrained slice with it
+	pub fn try_from(slice: &'a mut[T], relative_to: usize) -> Result<Self, Box<Error + 'static>> {
+		let expected = Op::r#do(relative_to, By::VALUE)?;
+		match slice.len() {
+			len if len == expected => Ok(Self::from(slice)),
+			len =>
+				Err(ConstraintViolation::relative::<Op, By>(len, relative_to))?
+		}
+	}
+	
 	/// Computes the expected relative length from `relative_to`, validates the wrapped `slice`
 	/// against in and returns it on success
 	pub fn get_slice_mut(self, relative_to: usize) -> Result<&'a mut[T], Box<Error + 'static>> {
