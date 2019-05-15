@@ -38,12 +38,12 @@ fn test_ranged_mut_err() {
 
 #[test]
 fn test_relative_mut() {
-	RelativeMut::<u8, Sub, _4>::from(s!(4)).get_slice_mut(8).unwrap();
-	RelativeMut::<u8, Sub, _8>::from(s!(9)).get_slice_mut(17).unwrap();
+	RelativeMut::<u8, Sub, _4>::from(s!(4)).slice_mut(8).unwrap();
+	RelativeMut::<u8, Sub, _8>::from(s!(9)).slice_mut(17).unwrap();
 }
 #[test]
 fn test_relative_mut_err() {
-	RelativeMut::<u8, Sub, _4>::from(s!(0)).get_slice_mut(3).unwrap_err();
-	RelativeMut::<u8, Sub, _4>::from(s!(3)).get_slice_mut(8).unwrap_err();
-	RelativeMut::<u8, Sub, _8>::from(s!(9)).get_slice_mut(16).unwrap_err();
+	RelativeMut::<u8, Sub, _4>::from(s!(0)).slice_mut(3).unwrap_err();
+	RelativeMut::<u8, Sub, _4>::from(s!(3)).slice_mut(8).unwrap_err();
+	RelativeMut::<u8, Sub, _8>::from(s!(9)).slice_mut(16).unwrap_err();
 }

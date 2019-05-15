@@ -56,7 +56,7 @@
 //! 	key: Fixed<u8, _32>, nonce: Fixed<u8, _12>) -> Result<usize, Box<Error + 'static>>
 //! {
 //! 	// Get buffer (we do this here because there may not be a relationship at an earlier stage)
-//! 	let buf = buf.get_slice_mut(plaintext.len())?;
+//! 	let buf = buf.slice_mut(plaintext.len())?;
 //!
 //! 	// Do sth.
 //! 	Ok(7)

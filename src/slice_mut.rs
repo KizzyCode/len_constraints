@@ -3,8 +3,8 @@ use crate::{
 	type_math::{ TypeNum, Operator }
 };
 use std::{
-	convert::TryFrom, error::Error, marker::PhantomData,
-	ops::{ Deref, DerefMut }
+	convert::TryFrom, error::Error, marker::PhantomData, slice::SliceIndex,
+	ops::{ Deref, DerefMut, Index, IndexMut }
 };
 
 
@@ -12,8 +12,17 @@ use std::{
 macro_rules! impl_conv {
 	($type:ty where $($impl_args:tt)*) => {
 		impl<$($impl_args)*> $type {
+			/// The length of the constrained slice
 			pub fn len(&self) -> usize {
 				self.slice.len()
+			}
+			/// The constrained slice
+			pub fn slice(&self) -> &[T] {
+				self.slice
+			}
+			/// The mutable constrained slice
+			pub fn slice_mut(&mut self) -> &mut[T] {
+				self.slice
 			}
 		}
 		impl<$($impl_args)*> Into<&'a[T]> for $type {
@@ -45,6 +54,17 @@ macro_rules! impl_conv {
 		impl<$($impl_args)*> AsMut<[T]> for $type {
 			fn as_mut(&mut self) -> &mut[T] {
 				self.slice
+			}
+		}
+		impl<$($impl_args)*, I: SliceIndex<[T]>> Index<I> for $type {
+			type Output = I::Output;
+			fn index(&self, index: I) -> &Self::Output {
+				&self.slice[index]
+			}
+		}
+		impl<$($impl_args)*, I: SliceIndex<[T]>> IndexMut<I> for $type {
+			fn index_mut(&mut self, index: I) -> &mut Self::Output {
+				&mut self.slice[index]
 			}
 		}
 	};
@@ -102,22 +122,29 @@ pub struct RelativeMut<'a, T, Op: Operator, By: TypeNum> {
 impl<'a, T, Op: Operator, By: TypeNum> RelativeMut<'a, T, Op, By> {
 	/// Validates `slice` against the length constraint and creates the constrained slice with it
 	pub fn try_from(slice: &'a mut[T], relative_to: usize) -> Result<Self, Box<Error + 'static>> {
-		let expected = Op::r#do(relative_to, By::VALUE)?;
-		match slice.len() {
-			len if len == expected => Ok(Self::from(slice)),
-			len =>
-				Err(ConstraintViolation::relative::<Op, By>(len, relative_to))?
-		}
+		Self::validate(slice.len(), relative_to)?;
+		Ok(Self::from(slice))
 	}
 	
 	/// Computes the expected relative length from `relative_to`, validates the wrapped `slice`
 	/// against in and returns it on success
-	pub fn get_slice_mut(self, relative_to: usize) -> Result<&'a mut[T], Box<Error + 'static>> {
+	pub fn slice(self, relative_to: usize) -> Result<&'a[T], Box<Error + 'static>> {
+		Self::validate(self.slice.len(), relative_to)?;
+		Ok(self.slice)
+	}
+	/// Computes the expected relative length from `relative_to`, validates the wrapped `slice`
+	/// against in and returns it on success
+	pub fn slice_mut(self, relative_to: usize) -> Result<&'a mut[T], Box<Error + 'static>> {
+		Self::validate(self.slice.len(), relative_to)?;
+		Ok(self.slice)
+	}
+	
+	/// Validates that `len` is valid relative to `relative_to`
+	fn validate(len: usize, relative_to: usize) -> Result<(), Box<Error + 'static>> {
 		let expected = Op::r#do(relative_to, By::VALUE)?;
-		match self.slice.len() {
-			len if len == expected => Ok(self.slice),
-			len =>
-				Err(ConstraintViolation::relative::<Op, By>(len, relative_to))?
+		match len == expected {
+			true => Ok(()),
+			false => Err(ConstraintViolation::relative::<Op, By>(len, relative_to))?
 		}
 	}
 }

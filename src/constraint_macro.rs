@@ -18,10 +18,10 @@
 #[macro_export]
 macro_rules! constraints {
 	($source:ident => $constrained:ty) => {
-		let $source: $constrained = ::std::convert::TryFrom::try_from($source)?;
+		let mut $source: $constrained = ::std::convert::TryFrom::try_from($source)?;
 	};
 	($source:ident => $constrained:ty [$len:expr]) => {
-		let $source = <$constrained>::try_from($source, $len)?;
+		let mut $source = <$constrained>::try_from($source, $len)?;
 	};
 	($( $source:ident => $constrained:ty $([$len:expr])* ),+) => {
 		$( constraints!($source => $constrained $([$len])*) );+
